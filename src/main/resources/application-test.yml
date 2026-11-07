@@ -1,0 +1,11 @@
+de:
+  flapdoodle:
+    mongodb:
+      embedded:
+        version: ${EMBEDDED_MONGO_VERSION:8.0.5}
+
+logging:
+  level:
+    root: WARN
+    com.eliascampos: INFO
+    de.flapdoodle: WARN

@@ -1,0 +1,7 @@
+# Em dev, um MongoDB embarcado e efemero e iniciado automaticamente.
+# Para usar um MongoDB real, rode com SPRING_PROFILES_ACTIVE=prod e MONGODB_URI.
+de:
+  flapdoodle:
+    mongodb:
+      embedded:
+        version: ${EMBEDDED_MONGO_VERSION:8.0.5}

@@ -1,0 +1,17 @@
+# Em producao o MongoDB embarcado fica desativado e a conexao usa MONGODB_URI.
+spring:
+  autoconfigure:
+    exclude: de.flapdoodle.embed.mongo.spring.autoconfigure.EmbeddedMongoAutoConfiguration
+  data:
+    mongodb:
+      # Sem valor padrao: a aplicacao falha ao subir se MONGODB_URI nao existir.
+      uri: ${MONGODB_URI}
+      # Indices continuam sendo criados na subida para garantir o e-mail unico.
+      # Com varias instancias ou zero-downtime, mova isso para um passo de deploy.
+      auto-index-creation: true
+
+# Nao expor detalhes de infraestrutura no health check publico.
+management:
+  endpoint:
+    health:
+      show-details: never

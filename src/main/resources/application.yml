@@ -1,0 +1,38 @@
+spring:
+  application:
+    name: api-usuarios
+  profiles:
+    default: dev
+  data:
+    mongodb:
+      uri: ${MONGODB_URI:mongodb://localhost:27018/usuarios}
+      auto-index-creation: true
+  jackson:
+    default-property-inclusion: non_null
+  data.web.pageable:
+    max-page-size: 50
+
+server:
+  port: ${PORT:8080}
+  error:
+    include-message: never
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+    operations-sorter: method
+  api-docs:
+    path: /v3/api-docs
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-details: always
+
+logging:
+  level:
+    org.mongodb.driver: WARN
