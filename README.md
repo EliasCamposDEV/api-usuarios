@@ -1,5 +1,8 @@
 # API de Gerenciamento de Usuários
 
+[![CI](https://github.com/EliasCamposDEV/api-usuarios/actions/workflows/ci.yml/badge.svg)](https://github.com/EliasCamposDEV/api-usuarios/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/github/license/EliasCamposDEV/api-usuarios)](LICENSE)
+
 API REST para CRUD de usuários, com validação, paginação, filtros e documentação OpenAPI. Java 17, Spring Boot 3.5, MongoDB.
 
 ## Rodar
