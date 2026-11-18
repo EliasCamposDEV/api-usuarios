@@ -24,3 +24,6 @@ jobs:
           cache: maven
 
       - run: mvn -B -ntp verify
+
+      - name: Build da imagem Docker
+        run: docker build -t api-usuarios:ci .
