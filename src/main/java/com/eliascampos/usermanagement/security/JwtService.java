@@ -27,6 +27,7 @@ public class JwtService {
     public static final String REFRESH_TOKEN_TYPE = "refresh";
 
     private static final String ROLES_CLAIM = "roles";
+    private static final String TOKEN_VERSION_CLAIM = "ver";
 
     private final JwtEncoder jwtEncoder;
     private final JwtDecoder refreshTokenDecoder;
@@ -68,22 +69,31 @@ public class JwtService {
         }
 
         // O dono do token precisa continuar existindo e ativo.
-        return userRepository.findByEmail(jwt.getSubject())
+        User user = userRepository.findByEmail(jwt.getSubject())
                 .filter(User::isActive)
-                .map(this::issue)
                 .orElseThrow(InvalidRefreshTokenException::new);
+
+        // Rotacao: so o refresh mais recente vale. Reusar o anterior (ou um de outra sessao) falha aqui.
+        if (!String.valueOf(user.getTokenVersion()).equals(jwt.getClaimAsString(TOKEN_VERSION_CLAIM))) {
+            throw new InvalidRefreshTokenException();
+        }
+        user.rotateTokenVersion();
+        userRepository.save(user);
+        return issue(user);
     }
 
     private String encode(User user, String type, Instant issuedAt, long ttlSeconds) {
-        JwtClaimsSet claims = JwtClaimsSet.builder()
+        JwtClaimsSet.Builder claims = JwtClaimsSet.builder()
                 .issuer(issuer)
                 .subject(user.getEmail())
                 .issuedAt(issuedAt)
                 .expiresAt(issuedAt.plusSeconds(ttlSeconds))
                 .claim(TOKEN_TYPE_CLAIM, type)
-                .claim(ROLES_CLAIM, List.of(user.getRole().name()))
-                .build();
+                .claim(ROLES_CLAIM, List.of(user.getRole().name()));
+        if (REFRESH_TOKEN_TYPE.equals(type)) {
+            claims.claim(TOKEN_VERSION_CLAIM, String.valueOf(user.getTokenVersion()));
+        }
         JwsHeader header = JwsHeader.with(MacAlgorithm.HS256).build();
-        return jwtEncoder.encode(JwtEncoderParameters.from(header, claims)).getTokenValue();
+        return jwtEncoder.encode(JwtEncoderParameters.from(header, claims.build())).getTokenValue();
     }
 }

@@ -119,6 +119,24 @@ class SecurityIntegrationTest {
     }
 
     @Test
+    void shouldRotateRefreshTokenAndRejectThePreviousOne() throws Exception {
+        String refreshToken = loginTokens(ADMIN_EMAIL, ADMIN_PASSWORD).get("refreshToken").asText();
+
+        String rotated = postRefresh(refreshToken)
+                .andExpect(status().isOk())
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+
+        postRefresh(refreshToken)
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.code").value("INVALID_REFRESH_TOKEN"));
+
+        postRefresh(objectMapper.readTree(rotated).get("refreshToken").asText())
+                .andExpect(status().isOk());
+    }
+
+    @Test
     void shouldRejectAccessTokenAtRefreshEndpoint() throws Exception {
         String accessToken = login(ADMIN_EMAIL, ADMIN_PASSWORD);
 

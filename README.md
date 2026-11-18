@@ -59,7 +59,9 @@ curl -X POST http://localhost:8080/auth/refresh \
   -d '{"refreshToken":"<refreshToken>"}'
 ```
 
-O refresh devolve 401 com `code: INVALID_REFRESH_TOKEN` se estiver expirado, adulterado, se for um access token ou se o usuário foi desativado. Um refresh token não é aceito como access token nas rotas protegidas (401).
+O refresh é **rotativo**: cada uso devolve um par novo e invalida o refresh anterior. Só o refresh mais recente de cada usuário vale — um novo login (ou refresh) derruba os anteriores. O access token já emitido continua válido até expirar (1 hora).
+
+O refresh devolve 401 com `code: INVALID_REFRESH_TOKEN` se estiver expirado, adulterado, se for um access token, se já tiver sido usado, se o usuário foi desativado ou se outro login invalidou aquela sessão. Um refresh token não é aceito como access token nas rotas protegidas (401).
 
 - O login usa os usuários do próprio banco (senha em BCrypt). Usuário com `active: false` não autentica.
 - O papel vem do campo `role`: token de `USER` recebe 403 em `/api/v1/users/**`.
@@ -98,7 +100,7 @@ Erros retornam `application/problem+json` com `code`: `VALIDATION_ERROR`, `INVAL
 mvn test
 ```
 
-16 testes de integração com MongoDB embarcado cobrindo criação, leitura, atualização, ativação, exclusão, paginação, busca, filtros, e-mail duplicado, validação, recurso inexistente, os erros 404/405 e autenticação (401 sem token ou credencial inválida, 403 para quem não é ADMIN, emissão e troca de refresh token, e recusa de token com o tipo errado).
+17 testes de integração com MongoDB embarcado cobrindo criação, leitura, atualização, ativação, exclusão, paginação, busca, filtros, e-mail duplicado, validação, recurso inexistente, os erros 404/405 e autenticação (401 sem token ou credencial inválida, 403 para quem não é ADMIN, emissão, rotação e troca de refresh token, e recusa de token com o tipo errado ou já rotacionado).
 
 ## Notas
 

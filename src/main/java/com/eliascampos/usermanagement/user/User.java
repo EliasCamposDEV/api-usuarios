@@ -23,6 +23,9 @@ public class User {
 
     private boolean active;
 
+    // Versao do refresh token em vigor: cada refresh emitido carrega este numero e a rotacao o incrementa.
+    private int tokenVersion;
+
     private Instant createdAt;
 
     private Instant updatedAt;
@@ -53,6 +56,10 @@ public class User {
         this.updatedAt = Instant.now();
     }
 
+    public void rotateTokenVersion() {
+        this.tokenVersion++;
+    }
+
     public String getId() {
         return id;
     }
@@ -75,6 +82,10 @@ public class User {
 
     public boolean isActive() {
         return active;
+    }
+
+    public int getTokenVersion() {
+        return tokenVersion;
     }
 
     public Instant getCreatedAt() {
