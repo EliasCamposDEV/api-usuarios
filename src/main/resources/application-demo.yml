@@ -1,0 +1,36 @@
+# Perfil da demo publica (Render + MongoDB Atlas).
+# Repete a postura de prod porque o Spring nao aceita spring.profiles.include
+# dentro de um arquivo de perfil. Se application-prod.yml mudar, replique aqui
+# o que fizer sentido para a demo.
+spring:
+  autoconfigure:
+    exclude: de.flapdoodle.embed.mongo.spring.autoconfigure.EmbeddedMongoAutoConfiguration
+  data:
+    mongodb:
+      # Sem valor padrao: a aplicacao falha ao subir se MONGODB_URI nao existir.
+      uri: ${MONGODB_URI}
+      auto-index-creation: true
+
+# Atras do proxy do Render: respeita X-Forwarded-For/Proto (IP real no rate limit do login).
+server:
+  forward-headers-strategy: framework
+
+# Nao expor detalhes de infraestrutura no health check publico.
+management:
+  endpoint:
+    health:
+      show-details: never
+
+app:
+  security:
+    jwt:
+      # Sem valor padrao: a aplicacao falha ao subir se JWT_SECRET nao existir.
+      secret: ${JWT_SECRET}
+  demo:
+    # Recusa POST/PUT/PATCH/DELETE em /api/v1 com 403 READ_ONLY_DEMO.
+    # Login, refresh, logout, Swagger e leitura continuam disponiveis.
+    read-only: true
+    # Credenciais publicas de proposito: a demo nao permite escrita.
+    admin:
+      email: ${DEMO_ADMIN_EMAIL:demo@eliascampos.dev}
+      password: ${DEMO_ADMIN_PASSWORD:demo-readonly-2026}

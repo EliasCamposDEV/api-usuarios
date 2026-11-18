@@ -15,12 +15,13 @@ import org.springframework.stereotype.Component;
 import java.util.Locale;
 
 /**
- * Cria o primeiro ADMIN em um banco vazio fora dos perfis dev e test, para que
+ * Cria o primeiro ADMIN em um banco vazio fora dos perfis dev, test e demo, para que
  * a API nao nasca sem nenhum usuario capaz de administrar os demais.
  * Sem APP_BOOTSTRAP_ADMIN_EMAIL e APP_BOOTSTRAP_ADMIN_PASSWORD nao faz nada.
+ * A demo tem o proprio seeder (DemoDataSeeder).
  */
 @Component
-@Profile("!dev & !test")
+@Profile("!dev & !test & !demo")
 public class AdminBootstrap implements ApplicationRunner {
 
     private static final Logger log = LoggerFactory.getLogger(AdminBootstrap.class);

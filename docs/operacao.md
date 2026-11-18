@@ -11,9 +11,24 @@
 | `CORS_ALLOWED_ORIGINS` | Origens de navegador liberadas, separadas por vírgula. Vazio desliga o CORS. |
 | `PORT` | Porta HTTP (padrão 8080). |
 
-O bootstrap de admin só roda fora dos perfis `dev` e `test`, só quando o banco está
-vazio e só se as duas variáveis estiverem preenchidas. Depois de criar o primeiro
+O bootstrap de admin só roda fora dos perfis `dev`, `test` e `demo`, só quando o banco
+está vazio e só se as duas variáveis estiverem preenchidas. Depois de criar o primeiro
 admin, remova as variáveis do ambiente.
+
+## Demo pública
+
+O perfil `demo` repete a configuração de `prod` e acrescenta:
+
+| Variável | Para que serve |
+|---|---|
+| `DEMO_ADMIN_EMAIL` | E-mail do admin de demo (padrão `demo@eliascampos.dev`). |
+| `DEMO_ADMIN_PASSWORD` | Senha pública do admin de demo (padrão `demo-readonly-2026`). |
+
+Com `app.demo.read-only: true` (definido em `application-demo.yml`),
+`POST`/`PUT`/`PATCH`/`DELETE` em `/api/v1/**` retornam `403 READ_ONLY_DEMO` antes de
+chegar ao controller. Login, refresh, logout, Swagger e leitura seguem abertos.
+Os usuários de exemplo são criados por `DemoDataSeeder` apenas com o banco vazio.
+Detalhes e deploy: [demo.md](demo.md) e [deploy-render.md](deploy-render.md).
 
 ## Primeira subida
 

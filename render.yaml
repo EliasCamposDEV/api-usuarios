@@ -1,0 +1,30 @@
+# Blueprint do Render: cria o servico web da demo a partir do Dockerfile.
+# Passo a passo completo (Atlas incluso): docs/deploy-render.md.
+services:
+  - type: web
+    name: api-usuarios-demo
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    plan: free
+    region: oregon
+    branch: main
+    autoDeploy: true
+    healthCheckPath: /actuator/health
+    envVars:
+      # Perfil demo = prod + somente leitura + usuarios de exemplo.
+      - key: SPRING_PROFILES_ACTIVE
+        value: demo
+      # Preenchida no painel do Render com a connection string do Atlas.
+      - key: MONGODB_URI
+        sync: false
+      # Gerado pelo Render no primeiro deploy (HS256, 32+ caracteres).
+      - key: JWT_SECRET
+        generateValue: true
+      # Credenciais publicas de proposito: a demo recusa toda escrita.
+      - key: DEMO_ADMIN_EMAIL
+        value: demo@eliascampos.dev
+      - key: DEMO_ADMIN_PASSWORD
+        value: demo-readonly-2026
+      # Instancia free tem 512 MB; deixa a JVM usar ate ~75% disso.
+      - key: JAVA_TOOL_OPTIONS
+        value: -XX:MaxRAMPercentage=75

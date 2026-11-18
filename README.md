@@ -3,11 +3,31 @@
 [![CI](https://github.com/EliasCamposDEV/api-usuarios/actions/workflows/ci.yml/badge.svg)](https://github.com/EliasCamposDEV/api-usuarios/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/github/license/EliasCamposDEV/api-usuarios)](LICENSE)
 
-**[Swagger UI](http://localhost:8080/swagger-ui.html)** — suba com `mvn spring-boot:run` e explore os endpoints na documentação interativa.
+**[Demo pública](https://api-usuarios-demo.onrender.com/swagger-ui.html)** (somente leitura) · **[Swagger local](http://localhost:8080/swagger-ui.html)** — suba com `mvn spring-boot:run` e explore os endpoints na documentação interativa.
 
-No Swagger, faça login em `POST /auth/login`, copie o `accessToken` e clique em **Authorize** para autenticar as chamadas de `/api/v1/users` sem curl.
+Na demo, faça login em `POST /auth/login` com `demo@eliascampos.dev` / `demo-readonly-2026`, copie o `accessToken` e clique em **Authorize** para autenticar as chamadas de `/api/v1/users` sem curl.
 
 API REST para CRUD de usuários, com validação, paginação, filtros e documentação OpenAPI. Java 21, Spring Boot 3.5, MongoDB.
+
+## Demo
+
+![Fluxo no Swagger: login, Authorize, criar e listar usuários](docs/demo.gif)
+
+| | |
+|---|---|
+| Swagger UI | `https://api-usuarios-demo.onrender.com/swagger-ui.html` |
+| Login | `demo@eliascampos.dev` / `demo-readonly-2026` |
+| Dados | 7 usuários fictícios criados no primeiro start |
+| Escrita | bloqueada com `403 READ_ONLY_DEMO` |
+| Postman | [coleção](postman/api-usuarios.postman_collection.json) · [environment](postman/demo.postman_environment.json) |
+
+A demo é **somente leitura de propósito**: qualquer pessoa pode logar e ler, mas
+`POST`/`PUT`/`PATCH`/`DELETE` em `/api/v1/**` retornam `403`. O GIF mostra o fluxo de
+escrita rodando localmente; a coleção do Postman funciona nos dois modos. O plano free
+do Render hiberna por inatividade — o primeiro request pode levar 30–60 s.
+
+Como rodar, limpar e o que está bloqueado: [docs/demo.md](docs/demo.md). Para publicar
+sua própria instância: [docs/deploy-render.md](docs/deploy-render.md).
 
 ## Rodar
 
@@ -84,6 +104,7 @@ Senha atual errada devolve 400 com `code: INVALID_PASSWORD`.
 - O papel vem do campo `role`: token de `USER` recebe 403 em `/api/v1/users/**`.
 - Em `dev` um admin é criado na primeira subida: `admin@email.com` / `admin12345`.
 - Em `prod`, defina `APP_BOOTSTRAP_ADMIN_EMAIL` e `APP_BOOTSTRAP_ADMIN_PASSWORD` para criar o primeiro `ADMIN` em banco vazio; sem as variáveis nada é criado.
+- O perfil `demo` usa a mesma postura de `prod`, cria usuários fictícios e recusa escrita em `/api/v1/**` com `403 READ_ONLY_DEMO`; veja [docs/demo.md](docs/demo.md).
 - `JWT_SECRET` (mínimo 32 caracteres, HS256) é obrigatória em `prod`; sem ela a aplicação não sobe.
 - Validades em `app.security.jwt.ttl-seconds` (access) e `refresh-ttl-seconds` (refresh).
 - `/auth/login` bloqueia após 5 tentativas erradas por e-mail + IP em 15 minutos (429 `TOO_MANY_ATTEMPTS`), em memória e por instância.
@@ -123,7 +144,7 @@ Erros retornam `application/problem+json` com `code`: `VALIDATION_ERROR`, `INVAL
 mvn test
 ```
 
-25 testes (22 de integração com MongoDB embarcado e 3 unitários do bootstrap) cobrindo criação, leitura, atualização, ativação, exclusão, paginação, busca, filtros, e-mail duplicado, validação, recurso inexistente, os erros 404/405 e autenticação (401 sem token ou credencial inválida, 403 para quem não é ADMIN, emissão, rotação e troca de refresh token, recusa de token com o tipo errado ou já rotacionado, troca de senha, logout e bloqueio por excesso de tentativas).
+32 testes (25 de integração com MongoDB embarcado e 7 unitários) cobrindo criação, leitura, atualização, ativação, exclusão, paginação, busca, filtros, e-mail duplicado, validação, recurso inexistente, os erros 404/405 e autenticação (401 sem token ou credencial inválida, 403 para quem não é ADMIN, emissão, rotação e troca de refresh token, recusa de token com o tipo errado ou já rotacionado, troca de senha, logout e bloqueio por excesso de tentativas). Os testes do modo demo garantem que login e leitura continuam funcionando e que toda escrita em `/api/v1/**` recebe `403 READ_ONLY_DEMO` sem alterar o banco.
 
 O `mvn verify` também roda o SpotBugs (falha em achados de prioridade alta).
 
