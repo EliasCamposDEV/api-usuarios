@@ -7,14 +7,19 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.Matchers.containsString;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
@@ -29,6 +34,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ActiveProfiles("test")
 class UserControllerIntegrationTest {
 
+    private static final String ADMIN_EMAIL = "admin@email.com";
+    private static final String ADMIN_PASSWORD = "admin12345";
+    private static final String DEFAULT_PASSWORD = "senha12345";
+
     @Autowired
     private MockMvc mockMvc;
 
@@ -38,19 +47,28 @@ class UserControllerIntegrationTest {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
+    private String adminToken;
+
     @BeforeEach
-    void cleanDatabase() {
+    void setUp() throws Exception {
         userRepository.deleteAll();
+        userRepository.save(new User("Zeta Admin", ADMIN_EMAIL, UserRole.ADMIN,
+                passwordEncoder.encode(ADMIN_PASSWORD)));
+        adminToken = login(ADMIN_EMAIL, ADMIN_PASSWORD);
     }
 
     @Test
     void shouldCreateReadUpdateDeactivateAndDeleteAUser() throws Exception {
-        MvcResult createdResult = mockMvc.perform(post("/api/v1/users")
+        MvcResult createdResult = perform(post("/api/v1/users")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json(Map.of(
                                 "name", "Ana Souza",
                                 "email", "ANA@Email.com",
-                                "role", "USER"))))
+                                "role", "USER",
+                                "password", DEFAULT_PASSWORD))))
                 .andExpect(status().isCreated())
                 .andExpect(header().exists("Location"))
                 .andExpect(jsonPath("$.id").isNotEmpty())
@@ -59,12 +77,12 @@ class UserControllerIntegrationTest {
 
         String id = readId(createdResult);
 
-        mockMvc.perform(get("/api/v1/users/{id}", id))
+        perform(get("/api/v1/users/{id}", id))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.name").value("Ana Souza"))
                 .andExpect(jsonPath("$.active").value(true));
 
-        mockMvc.perform(put("/api/v1/users/{id}", id)
+        perform(put("/api/v1/users/{id}", id)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json(Map.of(
                                 "name", "Ana Souza Lima",
@@ -74,16 +92,16 @@ class UserControllerIntegrationTest {
                 .andExpect(jsonPath("$.name").value("Ana Souza Lima"))
                 .andExpect(jsonPath("$.role").value("ADMIN"));
 
-        mockMvc.perform(patch("/api/v1/users/{id}/status", id)
+        perform(patch("/api/v1/users/{id}/status", id)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json(Map.of("active", false))))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.active").value(false));
 
-        mockMvc.perform(delete("/api/v1/users/{id}", id))
+        perform(delete("/api/v1/users/{id}", id))
                 .andExpect(status().isNoContent());
 
-        mockMvc.perform(get("/api/v1/users/{id}", id))
+        perform(get("/api/v1/users/{id}", id))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.code").value("RESOURCE_NOT_FOUND"));
     }
@@ -94,40 +112,41 @@ class UserControllerIntegrationTest {
         createUser("Bruno Lima", "bruno@email.com", "ADMIN");
         createUser("Carla Dias", "carla@email.com", "ADMIN");
 
-        mockMvc.perform(get("/api/v1/users")
+        perform(get("/api/v1/users")
                         .param("page", "0")
                         .param("size", "2")
                         .param("sort", "name,asc"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content.length()").value(2))
-                .andExpect(jsonPath("$.totalElements").value(3))
+                .andExpect(jsonPath("$.totalElements").value(4))
                 .andExpect(jsonPath("$.totalPages").value(2))
                 .andExpect(jsonPath("$.content[0].name").value("Ana Souza"));
 
-        mockMvc.perform(get("/api/v1/users").param("search", "bruno"))
+        perform(get("/api/v1/users").param("search", "bruno"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.totalElements").value(1))
                 .andExpect(jsonPath("$.content[0].email").value("bruno@email.com"));
 
-        mockMvc.perform(get("/api/v1/users").param("role", "ADMIN"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.totalElements").value(2));
-
-        mockMvc.perform(get("/api/v1/users").param("active", "true"))
+        perform(get("/api/v1/users").param("role", "ADMIN"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.totalElements").value(3));
+
+        perform(get("/api/v1/users").param("active", "true"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.totalElements").value(4));
     }
 
     @Test
     void shouldRejectDuplicateEmailIgnoringCase() throws Exception {
         createUser("Ana Souza", "ana@email.com", "USER");
 
-        mockMvc.perform(post("/api/v1/users")
+        perform(post("/api/v1/users")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json(Map.of(
                                 "name", "Outra Ana",
                                 "email", "ANA@EMAIL.COM",
-                                "role", "USER"))))
+                                "role", "USER",
+                                "password", DEFAULT_PASSWORD))))
                 .andExpect(status().isConflict())
                 .andExpect(jsonPath("$.code").value("EMAIL_ALREADY_EXISTS"));
     }
@@ -139,7 +158,7 @@ class UserControllerIntegrationTest {
         invalidBody.put("email", "email-invalido");
         invalidBody.put("role", null);
 
-        mockMvc.perform(post("/api/v1/users")
+        perform(post("/api/v1/users")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json(invalidBody)))
                 .andExpect(status().isBadRequest())
@@ -151,7 +170,7 @@ class UserControllerIntegrationTest {
 
     @Test
     void shouldReturnNotFoundForUnknownUser() throws Exception {
-        mockMvc.perform(put("/api/v1/users/nao-existe")
+        perform(put("/api/v1/users/nao-existe")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json(Map.of(
                                 "name", "Usuario Teste",
@@ -159,22 +178,51 @@ class UserControllerIntegrationTest {
                                 "role", "USER"))))
                 .andExpect(status().isNotFound());
 
-        mockMvc.perform(delete("/api/v1/users/nao-existe"))
+        perform(delete("/api/v1/users/nao-existe"))
                 .andExpect(status().isNotFound());
     }
 
+    @Test
+    void shouldReturnNotFoundForUnknownPathAndMethodNotAllowedForWrongMethod() throws Exception {
+        perform(get("/api/v1/caminho-inexistente"))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.code").value("RESOURCE_NOT_FOUND"));
+
+        perform(post("/api/v1/users/{id}", "algum-id"))
+                .andExpect(status().isMethodNotAllowed())
+                .andExpect(header().string("Allow", containsString("GET")))
+                .andExpect(jsonPath("$.code").value("METHOD_NOT_ALLOWED"));
+    }
+
     private void createUser(String name, String email, String role) throws Exception {
-        mockMvc.perform(post("/api/v1/users")
+        perform(post("/api/v1/users")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(json(Map.of("name", name, "email", email, "role", role))))
+                        .content(json(Map.of("name", name, "email", email, "role", role,
+                                "password", DEFAULT_PASSWORD))))
                 .andExpect(status().isCreated());
     }
 
+    private ResultActions perform(MockHttpServletRequestBuilder request) throws Exception {
+        return mockMvc.perform(request.header(HttpHeaders.AUTHORIZATION, "Bearer " + adminToken));
+    }
+
+    private String login(String email, String password) throws Exception {
+        MvcResult result = mockMvc.perform(post("/auth/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json(Map.of("email", email, "password", password))))
+                .andExpect(status().isOk())
+                .andReturn();
+        return readTree(result).get("accessToken").asText();
+    }
+
     private String readId(MvcResult result) throws Exception {
-        JsonNode body = objectMapper.readTree(result.getResponse().getContentAsString());
-        String id = body.get("id").asText();
+        String id = readTree(result).get("id").asText();
         assertThat(id).isNotBlank();
         return id;
+    }
+
+    private JsonNode readTree(MvcResult result) throws Exception {
+        return objectMapper.readTree(result.getResponse().getContentAsString());
     }
 
     private String json(Map<String, ?> value) throws Exception {

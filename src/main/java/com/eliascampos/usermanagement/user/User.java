@@ -17,6 +17,8 @@ public class User {
     @Indexed(unique = true)
     private String email;
 
+    private String passwordHash;
+
     private UserRole role;
 
     private boolean active;
@@ -29,10 +31,11 @@ public class User {
         // Construtor exigido pelo Spring Data MongoDB.
     }
 
-    public User(String name, String email, UserRole role) {
+    public User(String name, String email, UserRole role, String passwordHash) {
         this.name = name;
         this.email = email;
         this.role = role;
+        this.passwordHash = passwordHash;
         this.active = true;
         this.createdAt = Instant.now();
         this.updatedAt = this.createdAt;
@@ -60,6 +63,10 @@ public class User {
 
     public String getEmail() {
         return email;
+    }
+
+    public String getPasswordHash() {
+        return passwordHash;
     }
 
     public UserRole getRole() {

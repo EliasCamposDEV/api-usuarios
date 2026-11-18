@@ -15,3 +15,9 @@ management:
   endpoint:
     health:
       show-details: never
+
+app:
+  security:
+    jwt:
+      # Sem valor padrao: a aplicacao falha ao subir se JWT_SECRET nao existir.
+      secret: ${JWT_SECRET}

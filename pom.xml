@@ -18,7 +18,7 @@
     <description>API REST para gerenciamento de usuarios com Java, Spring Boot e MongoDB</description>
 
     <properties>
-        <java.version>17</java.version>
+        <java.version>21</java.version>
         <springdoc.version>2.8.17</springdoc.version>
         <flapdoodle.version>4.33.0</flapdoodle.version>
     </properties>
@@ -31,6 +31,14 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-validation</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-security</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-oauth2-resource-server</artifactId>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>

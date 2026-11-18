@@ -4,19 +4,24 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DuplicateKeyException;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.validation.FieldError;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import java.net.URI;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Set;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -60,6 +65,37 @@ public class GlobalExceptionHandler {
                 "Corpo ou parametro da requisicao invalido", request);
         problem.setProperty("code", "INVALID_REQUEST");
         return ResponseEntity.badRequest().body(problem);
+    }
+
+    @ExceptionHandler(AuthenticationException.class)
+    public ResponseEntity<ProblemDetail> handleAuthentication(AuthenticationException ex,
+                                                             HttpServletRequest request) {
+        ProblemDetail problem = problem(HttpStatus.UNAUTHORIZED, "Credenciais invalidas",
+                "E-mail ou senha invalidos", request);
+        problem.setProperty("code", "INVALID_CREDENTIALS");
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(problem);
+    }
+
+    @ExceptionHandler(NoResourceFoundException.class)
+    public ResponseEntity<ProblemDetail> handleUnknownPath(HttpServletRequest request) {
+        ProblemDetail problem = problem(HttpStatus.NOT_FOUND, "Recurso nao encontrado",
+                "Nao existe recurso no caminho " + request.getRequestURI(), request);
+        problem.setProperty("code", "RESOURCE_NOT_FOUND");
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(problem);
+    }
+
+    @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
+    public ResponseEntity<ProblemDetail> handleMethodNotAllowed(HttpRequestMethodNotSupportedException ex,
+                                                               HttpServletRequest request) {
+        ProblemDetail problem = problem(HttpStatus.METHOD_NOT_ALLOWED, "Metodo nao permitido",
+                "O metodo " + ex.getMethod() + " nao e suportado para este recurso", request);
+        problem.setProperty("code", "METHOD_NOT_ALLOWED");
+        ResponseEntity.BodyBuilder response = ResponseEntity.status(HttpStatus.METHOD_NOT_ALLOWED);
+        Set<HttpMethod> supported = ex.getSupportedHttpMethods();
+        if (supported != null) {
+            response.allow(supported.toArray(HttpMethod[]::new));
+        }
+        return response.body(problem);
     }
 
     @ExceptionHandler(Exception.class)

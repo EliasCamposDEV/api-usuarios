@@ -36,3 +36,11 @@ management:
 logging:
   level:
     org.mongodb.driver: WARN
+
+app:
+  security:
+    jwt:
+      # Minimo de 32 caracteres (HS256). Em producao, defina JWT_SECRET.
+      secret: ${JWT_SECRET:dev-only-secret-change-me-0123456789abcdef}
+      issuer: api-usuarios
+      ttl-seconds: 3600

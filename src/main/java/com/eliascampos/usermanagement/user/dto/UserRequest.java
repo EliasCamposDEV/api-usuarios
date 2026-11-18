@@ -19,6 +19,11 @@ public record UserRequest(
         @Size(max = 160, message = "O e-mail deve ter no maximo 160 caracteres")
         String email,
 
+        @Schema(example = "senha12345")
+        @NotBlank(message = "A senha e obrigatoria")
+        @Size(min = 8, max = 72, message = "A senha deve ter entre 8 e 72 caracteres")
+        String password,
+
         @Schema(example = "USER")
         @NotNull(message = "O perfil e obrigatorio")
         UserRole role

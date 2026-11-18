@@ -14,6 +14,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
@@ -27,10 +28,13 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final MongoTemplate mongoTemplate;
+    private final PasswordEncoder passwordEncoder;
 
-    public UserService(UserRepository userRepository, MongoTemplate mongoTemplate) {
+    public UserService(UserRepository userRepository, MongoTemplate mongoTemplate,
+                       PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.mongoTemplate = mongoTemplate;
+        this.passwordEncoder = passwordEncoder;
     }
 
     public UserResponse create(UserRequest request) {
@@ -39,7 +43,8 @@ public class UserService {
             throw new DuplicateEmailException(email);
         }
 
-        User user = new User(request.name().trim(), email, request.role());
+        User user = new User(request.name().trim(), email, request.role(),
+                passwordEncoder.encode(request.password()));
         try {
             return UserResponse.from(userRepository.save(user));
         } catch (DuplicateKeyException ex) {
