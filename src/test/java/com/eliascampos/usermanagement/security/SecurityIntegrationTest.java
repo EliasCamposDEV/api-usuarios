@@ -1,5 +1,6 @@
 package com.eliascampos.usermanagement.security;
 
+import com.eliascampos.usermanagement.auth.LoginRateLimiter;
 import com.eliascampos.usermanagement.user.User;
 import com.eliascampos.usermanagement.user.UserRepository;
 import com.eliascampos.usermanagement.user.UserRole;
@@ -21,6 +22,7 @@ import java.util.Map;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -45,11 +47,15 @@ class SecurityIntegrationTest {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    @Autowired
+    private LoginRateLimiter loginRateLimiter;
+
     @BeforeEach
     void cleanDatabase() {
         userRepository.deleteAll();
         userRepository.save(new User("Admin", ADMIN_EMAIL, UserRole.ADMIN,
                 passwordEncoder.encode(ADMIN_PASSWORD)));
+        loginRateLimiter.clear();
     }
 
     @Test
@@ -158,6 +164,73 @@ class SecurityIntegrationTest {
         String refreshToken = loginTokens(ADMIN_EMAIL, ADMIN_PASSWORD).get("refreshToken").asText();
 
         mockMvc.perform(get("/api/v1/users").header(HttpHeaders.AUTHORIZATION, "Bearer " + refreshToken))
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.code").value("UNAUTHORIZED"));
+    }
+
+    @Test
+    void shouldBlockLoginAfterTooManyFailures() throws Exception {
+        for (int attempt = 0; attempt < 5; attempt++) {
+            postLogin(ADMIN_EMAIL, "senha-errada").andExpect(status().isUnauthorized());
+        }
+
+        postLogin(ADMIN_EMAIL, ADMIN_PASSWORD)
+                .andExpect(status().isTooManyRequests())
+                .andExpect(jsonPath("$.code").value("TOO_MANY_ATTEMPTS"));
+    }
+
+    @Test
+    void shouldChangePasswordAndInvalidatePreviousTokens() throws Exception {
+        String accessToken = login(ADMIN_EMAIL, ADMIN_PASSWORD);
+        String refreshToken = loginTokens(ADMIN_EMAIL, ADMIN_PASSWORD).get("refreshToken").asText();
+
+        mockMvc.perform(put("/api/v1/me/password")
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json(Map.of("currentPassword", ADMIN_PASSWORD, "newPassword", "novaSenha123"))))
+                .andExpect(status().isNoContent());
+
+        postRefresh(refreshToken)
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.code").value("INVALID_REFRESH_TOKEN"));
+        postLogin(ADMIN_EMAIL, ADMIN_PASSWORD).andExpect(status().isUnauthorized());
+        postLogin(ADMIN_EMAIL, "novaSenha123").andExpect(status().isOk());
+    }
+
+    @Test
+    void shouldRejectWrongCurrentPassword() throws Exception {
+        String accessToken = login(ADMIN_EMAIL, ADMIN_PASSWORD);
+
+        mockMvc.perform(put("/api/v1/me/password")
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json(Map.of("currentPassword", "senha-errada", "newPassword", "novaSenha123"))))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value("INVALID_PASSWORD"));
+    }
+
+    @Test
+    void shouldLogoutAndInvalidateRefreshTokens() throws Exception {
+        String accessToken = login(ADMIN_EMAIL, ADMIN_PASSWORD);
+        String refreshToken = loginTokens(ADMIN_EMAIL, ADMIN_PASSWORD).get("refreshToken").asText();
+
+        mockMvc.perform(post("/auth/logout").header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken))
+                .andExpect(status().isNoContent());
+
+        postRefresh(refreshToken)
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.code").value("INVALID_REFRESH_TOKEN"));
+    }
+
+    @Test
+    void shouldRequireAuthenticationForAccountEndpoints() throws Exception {
+        mockMvc.perform(put("/api/v1/me/password")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json(Map.of("currentPassword", ADMIN_PASSWORD, "newPassword", "novaSenha123"))))
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.code").value("UNAUTHORIZED"));
+
+        mockMvc.perform(post("/auth/logout"))
                 .andExpect(status().isUnauthorized())
                 .andExpect(jsonPath("$.code").value("UNAUTHORIZED"));
     }

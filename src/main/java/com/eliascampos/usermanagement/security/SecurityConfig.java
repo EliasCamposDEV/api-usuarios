@@ -30,6 +30,7 @@ import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.web.cors.CorsConfiguration;
 
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
@@ -37,6 +38,8 @@ import java.io.IOException;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
+import java.util.Arrays;
+import java.util.List;
 
 @Configuration
 public class SecurityConfig {
@@ -44,7 +47,10 @@ public class SecurityConfig {
     private static final String ROLES_CLAIM = "roles";
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http, ObjectMapper objectMapper) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http, ObjectMapper objectMapper,
+                                                   @Value("${app.cors.allowed-origins:}") String allowedOrigins)
+            throws Exception {
+        configureCors(http, allowedOrigins);
         return http
                 // API stateless autenticada por token: nao ha sessao nem formulario para proteger com CSRF.
                 .csrf(AbstractHttpConfigurer::disable)
@@ -106,6 +112,22 @@ public class SecurityConfig {
         DaoAuthenticationProvider provider = new DaoAuthenticationProvider(userDetailsService);
         provider.setPasswordEncoder(passwordEncoder);
         return new ProviderManager(provider);
+    }
+
+    // CORS so entra em cena quando app.cors.allowed-origins tem origens configuradas.
+    private void configureCors(HttpSecurity http, String allowedOrigins) throws Exception {
+        List<String> origins = Arrays.stream(allowedOrigins.split(","))
+                .map(String::trim)
+                .filter(origin -> !origin.isEmpty())
+                .toList();
+        if (origins.isEmpty()) {
+            return;
+        }
+        CorsConfiguration config = new CorsConfiguration();
+        config.setAllowedOrigins(origins);
+        config.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
+        config.setAllowedHeaders(List.of("Authorization", "Content-Type"));
+        http.cors(cors -> cors.configurationSource(request -> config));
     }
 
     private JwtAuthenticationConverter jwtAuthenticationConverter() {

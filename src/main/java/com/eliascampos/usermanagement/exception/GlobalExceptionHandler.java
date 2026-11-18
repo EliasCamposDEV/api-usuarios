@@ -1,10 +1,12 @@
 package com.eliascampos.usermanagement.exception;
 
 import com.eliascampos.usermanagement.auth.InvalidRefreshTokenException;
+import com.eliascampos.usermanagement.auth.TooManyAttemptsException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DuplicateKeyException;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
@@ -84,6 +86,25 @@ public class GlobalExceptionHandler {
                 "O refresh token e invalido ou expirou", request);
         problem.setProperty("code", "INVALID_REFRESH_TOKEN");
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(problem);
+    }
+
+    @ExceptionHandler(InvalidPasswordException.class)
+    public ResponseEntity<ProblemDetail> handleInvalidPassword(InvalidPasswordException ex,
+                                                              HttpServletRequest request) {
+        ProblemDetail problem = problem(HttpStatus.BAD_REQUEST, "Senha incorreta", ex.getMessage(), request);
+        problem.setProperty("code", "INVALID_PASSWORD");
+        return ResponseEntity.badRequest().body(problem);
+    }
+
+    @ExceptionHandler(TooManyAttemptsException.class)
+    public ResponseEntity<ProblemDetail> handleTooManyAttempts(TooManyAttemptsException ex,
+                                                               HttpServletRequest request) {
+        ProblemDetail problem = problem(HttpStatus.TOO_MANY_REQUESTS, "Muitas tentativas de login",
+                "Muitas tentativas de login. Tente novamente mais tarde.", request);
+        problem.setProperty("code", "TOO_MANY_ATTEMPTS");
+        return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS)
+                .header(HttpHeaders.RETRY_AFTER, String.valueOf(ex.getRetryAfterSeconds()))
+                .body(problem);
     }
 
     @ExceptionHandler(NoResourceFoundException.class)

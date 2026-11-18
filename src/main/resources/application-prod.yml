@@ -10,6 +10,10 @@ spring:
       # Com varias instancias ou zero-downtime, mova isso para um passo de deploy.
       auto-index-creation: true
 
+# Atras de proxy reverso: respeita X-Forwarded-For/Proto (IP real no rate limit do login).
+server:
+  forward-headers-strategy: framework
+
 # Nao expor detalhes de infraestrutura no health check publico.
 management:
   endpoint:

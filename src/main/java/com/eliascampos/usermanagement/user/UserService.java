@@ -1,7 +1,9 @@
 package com.eliascampos.usermanagement.user;
 
 import com.eliascampos.usermanagement.exception.DuplicateEmailException;
+import com.eliascampos.usermanagement.exception.InvalidPasswordException;
 import com.eliascampos.usermanagement.exception.ResourceNotFoundException;
+import com.eliascampos.usermanagement.user.dto.ChangePasswordRequest;
 import com.eliascampos.usermanagement.user.dto.PageResponse;
 import com.eliascampos.usermanagement.user.dto.UserRequest;
 import com.eliascampos.usermanagement.user.dto.UserResponse;
@@ -113,6 +115,27 @@ public class UserService {
     public void delete(String id) {
         User user = findEntityById(id);
         userRepository.delete(user);
+    }
+
+    public void changePassword(String email, ChangePasswordRequest request) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new ResourceNotFoundException("Usuario autenticado nao encontrado"));
+
+        if (!passwordEncoder.matches(request.currentPassword(), user.getPasswordHash())) {
+            throw new InvalidPasswordException();
+        }
+
+        user.changePassword(passwordEncoder.encode(request.newPassword()));
+        // Qualquer refresh token anterior deixa de valer: a senha mudou.
+        user.rotateTokenVersion();
+        userRepository.save(user);
+    }
+
+    public void logout(String email) {
+        userRepository.findByEmail(email).ifPresent(user -> {
+            user.rotateTokenVersion();
+            userRepository.save(user);
+        });
     }
 
     private User findEntityById(String id) {
