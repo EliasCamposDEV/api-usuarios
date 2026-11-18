@@ -22,7 +22,9 @@ API REST para CRUD de usuários, com validação, paginação, filtros e documen
 | Postman | [coleção](postman/api-usuarios.postman_collection.json) · [environment](postman/demo.postman_environment.json) |
 
 A demo é **somente leitura de propósito**: qualquer pessoa pode logar e ler, mas
-`POST`/`PUT`/`PATCH`/`DELETE` em `/api/v1/**` retornam `403`. O GIF mostra o fluxo de
+`POST`/`PUT`/`PATCH`/`DELETE` em `/api/v1/**` retornam `403`. A raiz do site
+(`https://api-usuarios-demo.onrender.com/`) redireciona para o Swagger, então dá
+para mandar esse link para alguém sem explicar nada. O GIF mostra o fluxo de
 escrita rodando localmente; a coleção do Postman funciona nos dois modos. O plano free
 do Render hiberna por inatividade — o primeiro request pode levar 30–60 s.
 

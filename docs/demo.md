@@ -5,6 +5,9 @@ Demonstração pública e **somente leitura** da API, com dados fictícios:
 - Swagger UI: `https://api-usuarios-demo.onrender.com/swagger-ui.html`
 - Health: `https://api-usuarios-demo.onrender.com/actuator/health`
 
+A raiz (`https://api-usuarios-demo.onrender.com/`) responde `302` para o Swagger UI.
+Fora do perfil demo a raiz continua protegida e devolve `401`.
+
 O plano free do Render hiberna após alguns minutos sem acesso; o primeiro request
 pode levar 30–60 s. Se a URL acima não responder, veja [deploy-render.md](deploy-render.md).
 
