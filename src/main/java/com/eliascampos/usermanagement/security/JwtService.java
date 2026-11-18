@@ -52,10 +52,10 @@ public class JwtService {
     public TokenResponse issue(User user) {
         Instant now = Instant.now();
         return new TokenResponse(
-                encode(user, ACCESS_TOKEN_TYPE, now.plusSeconds(accessTtlSeconds)),
+                encode(user, ACCESS_TOKEN_TYPE, now, accessTtlSeconds),
                 "Bearer",
                 accessTtlSeconds,
-                encode(user, REFRESH_TOKEN_TYPE, now.plusSeconds(refreshTtlSeconds)),
+                encode(user, REFRESH_TOKEN_TYPE, now, refreshTtlSeconds),
                 refreshTtlSeconds);
     }
 
@@ -74,12 +74,12 @@ public class JwtService {
                 .orElseThrow(InvalidRefreshTokenException::new);
     }
 
-    private String encode(User user, String type, Instant expiresAt) {
+    private String encode(User user, String type, Instant issuedAt, long ttlSeconds) {
         JwtClaimsSet claims = JwtClaimsSet.builder()
                 .issuer(issuer)
                 .subject(user.getEmail())
-                .issuedAt(Instant.now())
-                .expiresAt(expiresAt)
+                .issuedAt(issuedAt)
+                .expiresAt(issuedAt.plusSeconds(ttlSeconds))
                 .claim(TOKEN_TYPE_CLAIM, type)
                 .claim(ROLES_CLAIM, List.of(user.getRole().name()))
                 .build();

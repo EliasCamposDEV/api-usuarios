@@ -15,6 +15,7 @@ import org.springframework.http.MediaType;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.ResultActions;
 
 import java.util.Map;
 
@@ -86,18 +87,14 @@ class SecurityIntegrationTest {
 
     @Test
     void shouldRejectInvalidCredentials() throws Exception {
-        mockMvc.perform(post("/auth/login")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(json(Map.of("email", ADMIN_EMAIL, "password", "senha-errada"))))
+        postLogin(ADMIN_EMAIL, "senha-errada")
                 .andExpect(status().isUnauthorized())
                 .andExpect(jsonPath("$.code").value("INVALID_CREDENTIALS"));
     }
 
     @Test
     void shouldReturnAccessAndRefreshTokensOnLogin() throws Exception {
-        mockMvc.perform(post("/auth/login")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(json(Map.of("email", ADMIN_EMAIL, "password", ADMIN_PASSWORD))))
+        postLogin(ADMIN_EMAIL, ADMIN_PASSWORD)
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.accessToken").isNotEmpty())
                 .andExpect(jsonPath("$.refreshToken").isNotEmpty())
@@ -108,9 +105,7 @@ class SecurityIntegrationTest {
     void shouldExchangeRefreshTokenForNewAccessToken() throws Exception {
         String refreshToken = loginTokens(ADMIN_EMAIL, ADMIN_PASSWORD).get("refreshToken").asText();
 
-        String body = mockMvc.perform(post("/auth/refresh")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(json(Map.of("refreshToken", refreshToken))))
+        String body = postRefresh(refreshToken)
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.refreshToken").isNotEmpty())
                 .andReturn()
@@ -127,18 +122,14 @@ class SecurityIntegrationTest {
     void shouldRejectAccessTokenAtRefreshEndpoint() throws Exception {
         String accessToken = login(ADMIN_EMAIL, ADMIN_PASSWORD);
 
-        mockMvc.perform(post("/auth/refresh")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(json(Map.of("refreshToken", accessToken))))
+        postRefresh(accessToken)
                 .andExpect(status().isUnauthorized())
                 .andExpect(jsonPath("$.code").value("INVALID_REFRESH_TOKEN"));
     }
 
     @Test
     void shouldRejectUnknownRefreshToken() throws Exception {
-        mockMvc.perform(post("/auth/refresh")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(json(Map.of("refreshToken", "nao-e-um-jwt"))))
+        postRefresh("nao-e-um-jwt")
                 .andExpect(status().isUnauthorized())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_PROBLEM_JSON))
                 .andExpect(jsonPath("$.code").value("INVALID_REFRESH_TOKEN"));
@@ -158,14 +149,24 @@ class SecurityIntegrationTest {
     }
 
     private JsonNode loginTokens(String email, String password) throws Exception {
-        String body = mockMvc.perform(post("/auth/login")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(json(Map.of("email", email, "password", password))))
+        String body = postLogin(email, password)
                 .andExpect(status().isOk())
                 .andReturn()
                 .getResponse()
                 .getContentAsString();
         return objectMapper.readTree(body);
+    }
+
+    private ResultActions postLogin(String email, String password) throws Exception {
+        return mockMvc.perform(post("/auth/login")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(json(Map.of("email", email, "password", password))));
+    }
+
+    private ResultActions postRefresh(String refreshToken) throws Exception {
+        return mockMvc.perform(post("/auth/refresh")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(json(Map.of("refreshToken", refreshToken))));
     }
 
     private String json(Map<String, ?> value) throws Exception {
