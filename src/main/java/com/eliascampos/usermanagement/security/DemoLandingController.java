@@ -1,5 +1,6 @@
 package com.eliascampos.usermanagement.security;
 
+import io.swagger.v3.oas.annotations.Hidden;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,6 +15,7 @@ import java.net.URI;
  * Fora do perfil demo este controller nem existe e a raiz continua protegida.
  */
 @RestController
+@Hidden
 @ConditionalOnProperty(name = "app.demo.read-only", havingValue = "true")
 public class DemoLandingController {
 
