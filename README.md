@@ -5,6 +5,8 @@
 
 **[Swagger UI](http://localhost:8080/swagger-ui.html)** — suba com `mvn spring-boot:run` e explore os endpoints na documentação interativa.
 
+No Swagger, faça login em `POST /auth/login`, copie o `accessToken` e clique em **Authorize** para autenticar as chamadas de `/api/v1/users` sem curl.
+
 API REST para CRUD de usuários, com validação, paginação, filtros e documentação OpenAPI. Java 21, Spring Boot 3.5, MongoDB.
 
 ## Rodar

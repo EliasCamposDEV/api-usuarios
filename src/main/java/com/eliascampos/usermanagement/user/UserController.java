@@ -6,6 +6,7 @@ import com.eliascampos.usermanagement.user.dto.UserResponse;
 import com.eliascampos.usermanagement.user.dto.UserStatusRequest;
 import com.eliascampos.usermanagement.user.dto.UserUpdateRequest;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Pageable;
@@ -26,7 +27,8 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
 
-@Tag(name = "Usuarios", description = "Operacoes de gerenciamento de usuarios")
+@Tag(name = "Usuarios", description = "Operacoes de gerenciamento de usuarios (exige ADMIN)")
+@SecurityRequirement(name = "bearerAuth")
 @RestController
 @RequestMapping("/api/v1/users")
 public class UserController {
