@@ -3,6 +3,7 @@ package com.eliascampos.usermanagement.security;
 import com.eliascampos.usermanagement.user.User;
 import com.eliascampos.usermanagement.user.UserRepository;
 import com.eliascampos.usermanagement.user.UserRole;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -92,7 +93,71 @@ class SecurityIntegrationTest {
                 .andExpect(jsonPath("$.code").value("INVALID_CREDENTIALS"));
     }
 
+    @Test
+    void shouldReturnAccessAndRefreshTokensOnLogin() throws Exception {
+        mockMvc.perform(post("/auth/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json(Map.of("email", ADMIN_EMAIL, "password", ADMIN_PASSWORD))))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.accessToken").isNotEmpty())
+                .andExpect(jsonPath("$.refreshToken").isNotEmpty())
+                .andExpect(jsonPath("$.refreshExpiresIn").value(604800));
+    }
+
+    @Test
+    void shouldExchangeRefreshTokenForNewAccessToken() throws Exception {
+        String refreshToken = loginTokens(ADMIN_EMAIL, ADMIN_PASSWORD).get("refreshToken").asText();
+
+        String body = mockMvc.perform(post("/auth/refresh")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json(Map.of("refreshToken", refreshToken))))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.refreshToken").isNotEmpty())
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+
+        mockMvc.perform(get("/api/v1/users")
+                        .header(HttpHeaders.AUTHORIZATION,
+                                "Bearer " + objectMapper.readTree(body).get("accessToken").asText()))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    void shouldRejectAccessTokenAtRefreshEndpoint() throws Exception {
+        String accessToken = login(ADMIN_EMAIL, ADMIN_PASSWORD);
+
+        mockMvc.perform(post("/auth/refresh")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json(Map.of("refreshToken", accessToken))))
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.code").value("INVALID_REFRESH_TOKEN"));
+    }
+
+    @Test
+    void shouldRejectUnknownRefreshToken() throws Exception {
+        mockMvc.perform(post("/auth/refresh")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json(Map.of("refreshToken", "nao-e-um-jwt"))))
+                .andExpect(status().isUnauthorized())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_PROBLEM_JSON))
+                .andExpect(jsonPath("$.code").value("INVALID_REFRESH_TOKEN"));
+    }
+
+    @Test
+    void shouldRejectRefreshTokenOnProtectedRoutes() throws Exception {
+        String refreshToken = loginTokens(ADMIN_EMAIL, ADMIN_PASSWORD).get("refreshToken").asText();
+
+        mockMvc.perform(get("/api/v1/users").header(HttpHeaders.AUTHORIZATION, "Bearer " + refreshToken))
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.code").value("UNAUTHORIZED"));
+    }
+
     private String login(String email, String password) throws Exception {
+        return loginTokens(email, password).get("accessToken").asText();
+    }
+
+    private JsonNode loginTokens(String email, String password) throws Exception {
         String body = mockMvc.perform(post("/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json(Map.of("email", email, "password", password))))
@@ -100,7 +165,7 @@ class SecurityIntegrationTest {
                 .andReturn()
                 .getResponse()
                 .getContentAsString();
-        return objectMapper.readTree(body).get("accessToken").asText();
+        return objectMapper.readTree(body);
     }
 
     private String json(Map<String, ?> value) throws Exception {

@@ -44,3 +44,5 @@ app:
       secret: ${JWT_SECRET:dev-only-secret-change-me-0123456789abcdef}
       issuer: api-usuarios
       ttl-seconds: 3600
+      # 7 dias: vida do refresh token usado em /auth/refresh.
+      refresh-ttl-seconds: 604800

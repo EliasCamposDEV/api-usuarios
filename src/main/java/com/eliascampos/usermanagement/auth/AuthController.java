@@ -1,6 +1,7 @@
 package com.eliascampos.usermanagement.auth;
 
 import com.eliascampos.usermanagement.auth.dto.LoginRequest;
+import com.eliascampos.usermanagement.auth.dto.RefreshRequest;
 import com.eliascampos.usermanagement.auth.dto.TokenResponse;
 import com.eliascampos.usermanagement.security.AppUserDetails;
 import com.eliascampos.usermanagement.security.JwtService;
@@ -15,7 +16,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-@Tag(name = "Autenticacao", description = "Login e emissao de token")
+@Tag(name = "Autenticacao", description = "Login, emissao de token e refresh")
 @RestController
 @RequestMapping("/auth")
 public class AuthController {
@@ -28,12 +29,18 @@ public class AuthController {
         this.jwtService = jwtService;
     }
 
-    @Operation(summary = "Autentica com e-mail e senha e devolve um token JWT")
+    @Operation(summary = "Autentica com e-mail e senha e devolve access e refresh token")
     @PostMapping("/login")
     public TokenResponse login(@Valid @RequestBody LoginRequest request) {
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(request.email(), request.password()));
         AppUserDetails principal = (AppUserDetails) authentication.getPrincipal();
         return jwtService.issue(principal.getUser());
+    }
+
+    @Operation(summary = "Troca o refresh token por um novo access token")
+    @PostMapping("/refresh")
+    public TokenResponse refresh(@Valid @RequestBody RefreshRequest request) {
+        return jwtService.refresh(request.refreshToken());
     }
 }

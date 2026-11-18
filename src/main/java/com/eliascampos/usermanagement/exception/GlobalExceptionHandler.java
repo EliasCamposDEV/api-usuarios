@@ -1,5 +1,6 @@
 package com.eliascampos.usermanagement.exception;
 
+import com.eliascampos.usermanagement.auth.InvalidRefreshTokenException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -73,6 +74,15 @@ public class GlobalExceptionHandler {
         ProblemDetail problem = problem(HttpStatus.UNAUTHORIZED, "Credenciais invalidas",
                 "E-mail ou senha invalidos", request);
         problem.setProperty("code", "INVALID_CREDENTIALS");
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(problem);
+    }
+
+    @ExceptionHandler(InvalidRefreshTokenException.class)
+    public ResponseEntity<ProblemDetail> handleInvalidRefreshToken(InvalidRefreshTokenException ex,
+                                                                  HttpServletRequest request) {
+        ProblemDetail problem = problem(HttpStatus.UNAUTHORIZED, "Refresh token invalido",
+                "O refresh token e invalido ou expirou", request);
+        problem.setProperty("code", "INVALID_REFRESH_TOKEN");
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(problem);
     }
 

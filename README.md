@@ -43,16 +43,27 @@ curl -X POST http://localhost:8080/auth/login \
   -d '{"email":"admin@email.com","password":"admin12345"}'
 ```
 
-A resposta traz `accessToken`; use nas demais chamadas:
+A resposta traz `accessToken` (1 hora) e `refreshToken` (7 dias); use o access nas demais chamadas:
 
 ```bash
 curl http://localhost:8080/api/v1/users -H "Authorization: Bearer <accessToken>"
 ```
 
+Quando o access token expirar, troque o refresh por um par novo:
+
+```bash
+curl -X POST http://localhost:8080/auth/refresh \
+  -H "Content-Type: application/json" \
+  -d '{"refreshToken":"<refreshToken>"}'
+```
+
+O refresh devolve 401 com `code: INVALID_REFRESH_TOKEN` se estiver expirado, adulterado, se for um access token ou se o usuário foi desativado. Um refresh token não é aceito como access token nas rotas protegidas (401).
+
 - O login usa os usuários do próprio banco (senha em BCrypt). Usuário com `active: false` não autentica.
 - O papel vem do campo `role`: token de `USER` recebe 403 em `/api/v1/users/**`.
 - Em `dev` um admin é criado na primeira subida: `admin@email.com` / `admin12345`.
 - `JWT_SECRET` (mínimo 32 caracteres, HS256) é obrigatória em `prod`; sem ela a aplicação não sobe.
+- Validades em `app.security.jwt.ttl-seconds` (access) e `refresh-ttl-seconds` (refresh).
 
 ## Endpoints
 
@@ -77,7 +88,7 @@ curl -X POST http://localhost:8080/api/v1/users \
   -d '{"name":"Maria Silva","email":"maria.silva@email.com","role":"USER","password":"senha12345"}'
 ```
 
-Erros retornam `application/problem+json` com `code`: `VALIDATION_ERROR`, `INVALID_REQUEST`, `RESOURCE_NOT_FOUND`, `EMAIL_ALREADY_EXISTS`, `INTERNAL_ERROR`.
+Erros retornam `application/problem+json` com `code`: `VALIDATION_ERROR`, `INVALID_REQUEST`, `RESOURCE_NOT_FOUND`, `EMAIL_ALREADY_EXISTS`, `INVALID_CREDENTIALS`, `INVALID_REFRESH_TOKEN`, `INTERNAL_ERROR`.
 
 ## Testes
 
@@ -85,7 +96,7 @@ Erros retornam `application/problem+json` com `code`: `VALIDATION_ERROR`, `INVAL
 mvn test
 ```
 
-11 testes de integração com MongoDB embarcado cobrindo criação, leitura, atualização, ativação, exclusão, paginação, busca, filtros, e-mail duplicado, validação, recurso inexistente, os erros 404/405 e autenticação (401 sem token ou credencial inválida, 403 para quem não é ADMIN).
+16 testes de integração com MongoDB embarcado cobrindo criação, leitura, atualização, ativação, exclusão, paginação, busca, filtros, e-mail duplicado, validação, recurso inexistente, os erros 404/405 e autenticação (401 sem token ou credencial inválida, 403 para quem não é ADMIN, emissão e troca de refresh token, e recusa de token com o tipo errado).
 
 ## Notas
 
