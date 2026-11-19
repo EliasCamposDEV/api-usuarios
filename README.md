@@ -1,13 +1,15 @@
-# API de Gerenciamento de Usuários
+# Livro da Guilda
 
-[![CI](https://github.com/EliasCamposDEV/api-usuarios/actions/workflows/ci.yml/badge.svg)](https://github.com/EliasCamposDEV/api-usuarios/actions/workflows/ci.yml)
-[![License: MIT](https://img.shields.io/github/license/EliasCamposDEV/api-usuarios)](LICENSE)
+[![CI](https://github.com/EliasCamposDEV/livro-da-guilda/actions/workflows/ci.yml/badge.svg)](https://github.com/EliasCamposDEV/livro-da-guilda/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/github/license/EliasCamposDEV/livro-da-guilda)](LICENSE)
 
-**[Demo pública](https://api-usuarios-demo.onrender.com/swagger-ui.html)** (somente leitura) · **[Swagger local](http://localhost:8080/swagger-ui.html)** — suba com `mvn spring-boot:run` e explore os endpoints na documentação interativa.
+**[Demo pública](https://livro-da-guilda.onrender.com/swagger-ui.html)** (somente leitura) · **[Swagger local](http://localhost:8080/swagger-ui.html)** — suba com `mvn spring-boot:run` e explore os endpoints na documentação interativa.
 
 Na demo, faça login em `POST /auth/login` com `demo@eliascampos.dev` / `demo-readonly-2026`, copie o `accessToken` e clique em **Authorize** para autenticar as chamadas de `/api/v1/users` sem curl.
 
 API REST para CRUD de usuários, com validação, paginação, filtros e documentação OpenAPI. Java 21, Spring Boot 3.5, MongoDB.
+
+O nome vem de RPG: o livro da guilda registra quem é membro, qual papel tem e o que pode fazer — a mesma ideia de um cadastro de usuários com JWT e papéis (`ADMIN`).
 
 ## Demo
 
@@ -15,15 +17,15 @@ API REST para CRUD de usuários, com validação, paginação, filtros e documen
 
 | | |
 |---|---|
-| Swagger UI | `https://api-usuarios-demo.onrender.com/swagger-ui.html` |
+| Swagger UI | `https://livro-da-guilda.onrender.com/swagger-ui.html` |
 | Login | `demo@eliascampos.dev` / `demo-readonly-2026` |
 | Dados | 7 usuários fictícios criados no primeiro start |
 | Escrita | bloqueada com `403 READ_ONLY_DEMO` |
-| Postman | [coleção](postman/api-usuarios.postman_collection.json) · [environment](postman/demo.postman_environment.json) |
+| Postman | [coleção](postman/livro-da-guilda.postman_collection.json) · [environment](postman/demo.postman_environment.json) |
 
 A demo é **somente leitura de propósito**: qualquer pessoa pode logar e ler, mas
 `POST`/`PUT`/`PATCH`/`DELETE` em `/api/v1/**` retornam `403`. A raiz do site
-(`https://api-usuarios-demo.onrender.com/`) redireciona para o Swagger, então dá
+(`https://livro-da-guilda.onrender.com/`) redireciona para o Swagger, então dá
 para mandar esse link para alguém sem explicar nada. O GIF mostra o fluxo de
 escrita rodando localmente; a coleção do Postman funciona nos dois modos. O plano free
 do Render hiberna por inatividade — o primeiro request pode levar 30–60 s.

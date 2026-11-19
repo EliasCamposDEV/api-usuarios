@@ -2,10 +2,10 @@
 
 Demonstração pública e **somente leitura** da API, com dados fictícios:
 
-- Swagger UI: `https://api-usuarios-demo.onrender.com/swagger-ui.html`
-- Health: `https://api-usuarios-demo.onrender.com/actuator/health`
+- Swagger UI: `https://livro-da-guilda.onrender.com/swagger-ui.html`
+- Health: `https://livro-da-guilda.onrender.com/actuator/health`
 
-A raiz (`https://api-usuarios-demo.onrender.com/`) responde `302` para o Swagger UI.
+A raiz (`https://livro-da-guilda.onrender.com/`) responde `302` para o Swagger UI.
 Fora do perfil demo a raiz continua protegida e devolve `401`.
 
 O plano free do Render hiberna após alguns minutos sem acesso; o primeiro request
@@ -72,9 +72,9 @@ no `docker-compose.yml`.
 
 ## Postman
 
-1. Importe [`postman/api-usuarios.postman_collection.json`](../postman/api-usuarios.postman_collection.json)
+1. Importe [`postman/livro-da-guilda.postman_collection.json`](../postman/livro-da-guilda.postman_collection.json)
    e [`postman/demo.postman_environment.json`](../postman/demo.postman_environment.json).
-2. Selecione o environment **api-usuarios demo** e ajuste `baseUrl` se o Render tiver
+2. Selecione o environment **livro-da-guilda demo** e ajuste `baseUrl` se o Render tiver
    adicionado sufixo ao nome.
 3. Rode **Auth → Login**: o script salva `accessToken` e `refreshToken` nas variáveis.
 4. As requisições de leitura funcionam na demo; as de escrita retornam `403` de propósito.

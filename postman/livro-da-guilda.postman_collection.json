@@ -1,7 +1,7 @@
 {
   "info": {
-    "name": "api-usuarios",
-    "description": "Colecao da API de gerenciamento de usuarios (Java 21 + Spring Boot + MongoDB).\n\nUse o environment `api-usuarios demo` para testar a demo publica somente leitura, ou troque `baseUrl` para http://localhost:8080 e rode em dev para exercitar escrita.\n\nRode `Auth > Login` primeiro: o script salva `accessToken` e `refreshToken` nas variaveis da colecao.",
+    "name": "livro-da-guilda",
+    "description": "Colecao da API de gerenciamento de usuarios (Java 21 + Spring Boot + MongoDB).\n\nUse o environment `livro-da-guilda demo` para testar a demo publica somente leitura, ou troque `baseUrl` para http://localhost:8080 e rode em dev para exercitar escrita.\n\nRode `Auth > Login` primeiro: o script salva `accessToken` e `refreshToken` nas variaveis da colecao.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "variable": [

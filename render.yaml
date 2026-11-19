@@ -2,7 +2,7 @@
 # Passo a passo completo (Atlas incluso): docs/deploy-render.md.
 services:
   - type: web
-    name: api-usuarios-demo
+    name: livro-da-guilda
     runtime: docker
     dockerfilePath: ./Dockerfile
     plan: free

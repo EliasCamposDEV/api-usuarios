@@ -12,9 +12,9 @@
     </parent>
 
     <groupId>com.eliascampos</groupId>
-    <artifactId>api-usuarios</artifactId>
+    <artifactId>livro-da-guilda</artifactId>
     <version>1.0.0</version>
-    <name>api-usuarios</name>
+    <name>livro-da-guilda</name>
     <description>API REST para gerenciamento de usuarios com Java, Spring Boot e MongoDB</description>
 
     <properties>

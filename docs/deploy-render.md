@@ -20,7 +20,7 @@ Tempo estimado: 20 a 30 minutos. Custo: R$ 0.
 1. Crie uma conta em <https://www.mongodb.com/cloud/atlas/register> e um cluster
    **M0 (Free)**. Região mais próxima do Render escolhido (ex.: AWS `us-east-1`/Oregon).
 2. **Database Access** → *Add New Database User*:
-   - usuário: `api-usuarios-demo`
+   - usuário: `livro-da-guilda`
    - senha: gere uma forte e guarde (ela vai na URL)
    - privilégio: *Read and write to any database*
 3. **Network Access** → *Add IP Address* → `0.0.0.0/0`.
@@ -28,26 +28,26 @@ Tempo estimado: 20 a 30 minutos. Custo: R$ 0.
    real fica no usuário/senha do banco e no fato de a API ser somente leitura.
 4. **Connect** → *Drivers* → copie a string e **coloque o nome do banco**:
    ```text
-   mongodb+srv://api-usuarios-demo:SENHA@cluster0.xxxxx.mongodb.net/api-usuarios-demo?retryWrites=true&w=majority
+   mongodb+srv://livro-da-guilda:SENHA@cluster0.xxxxx.mongodb.net/livro-da-guilda?retryWrites=true&w=majority
    ```
    Se a senha tiver caracteres especiais, use a versão URL-encoded.
 
 ## 2. Render
 
 1. Crie a conta em <https://render.com> e conecte o GitHub (`EliasCamposDEV`).
-2. **New** → **Blueprint** → selecione `api-usuarios`.
-   O Render lê o `render.yaml` e propõe o serviço `api-usuarios-demo`.
+2. **New** → **Blueprint** → selecione `livro-da-guilda`.
+   O Render lê o `render.yaml` e propõe o serviço `livro-da-guilda`.
 3. Preencha a variável secreta:
    | Variável | Valor |
    |---|---|
-   | `MONGODB_URI` | string do Atlas, com `/api-usuarios-demo` no caminho |
+   | `MONGODB_URI` | string do Atlas, com `/livro-da-guilda` no caminho |
 
    `JWT_SECRET` é gerado pelo Render. `SPRING_PROFILES_ACTIVE=demo`, `DEMO_ADMIN_EMAIL`
    e `DEMO_ADMIN_PASSWORD` já vêm do blueprint (senha pública de propósito, porque a
    demo é somente leitura).
 4. **Apply** e aguarde o build (primeiro build baixa as dependências Maven: 5–10 min).
 5. A URL fica no topo do serviço, algo como
-   `https://api-usuarios-demo.onrender.com`. Se o nome já estiver em uso, o Render
+   `https://livro-da-guilda.onrender.com`. Se o nome já estiver em uso, o Render
    adiciona um sufixo — ajuste os links do README nesse caso.
 
 Alternativa manual (sem Blueprint): **New** → **Web Service** → repositório →
@@ -57,7 +57,7 @@ as mesmas variáveis acima.
 ## 3. Validar
 
 ```bash
-BASE=https://api-usuarios-demo.onrender.com
+BASE=https://livro-da-guilda.onrender.com
 
 curl -s $BASE/actuator/health
 # {"status":"UP"}
@@ -85,7 +85,7 @@ No PowerShell, use `Invoke-RestMethod` ou importe a coleção do Postman em
 
 ## 4. Resetar os dados da demo
 
-No Atlas: **Browse Collections** → banco `api-usuarios-demo` → coleção `usuarios` →
+No Atlas: **Browse Collections** → banco `livro-da-guilda` → coleção `usuarios` →
 *Drop collection*. No próximo start (ou restart do serviço no Render) o seeder recria
 os 7 usuários. Os dados também somem se você apagar o cluster.
 

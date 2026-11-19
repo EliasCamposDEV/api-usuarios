@@ -51,7 +51,7 @@ docker compose cp ./backup-2026-11-18.gz mongo:/tmp/restore.gz
 docker compose exec -T mongo mongorestore --archive=/tmp/restore.gz --gzip --drop
 ```
 
-Os dados ficam no volume `api-usuarios-mongo-data`; `docker compose down` sem `-v`
+Os dados ficam no volume `livro-da-guilda-mongo-data`; `docker compose down` sem `-v`
 preserva o volume.
 
 ## Rotação do JWT_SECRET

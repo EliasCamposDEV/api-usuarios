@@ -1,10 +1,10 @@
 services:
   mongo:
     image: mongo:8
-    container_name: api-usuarios-mongo
+    container_name: livro-da-guilda-mongo
     restart: unless-stopped
     volumes:
-      - api-usuarios-mongo-data:/data/db
+      - livro-da-guilda-mongo-data:/data/db
     healthcheck:
       test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping').ok"]
       interval: 10s
@@ -13,7 +13,7 @@ services:
 
   api:
     build: .
-    container_name: api-usuarios
+    container_name: livro-da-guilda
     restart: unless-stopped
     depends_on:
       mongo:
@@ -34,4 +34,4 @@ services:
       start_period: 30s
 
 volumes:
-  api-usuarios-mongo-data:
+  livro-da-guilda-mongo-data:

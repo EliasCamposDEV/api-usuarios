@@ -1,6 +1,6 @@
 spring:
   application:
-    name: api-usuarios
+    name: livro-da-guilda
   profiles:
     default: dev
   data:
@@ -50,7 +50,7 @@ app:
     jwt:
       # Minimo de 32 caracteres (HS256). Em producao, defina JWT_SECRET.
       secret: ${JWT_SECRET:dev-only-secret-change-me-0123456789abcdef}
-      issuer: api-usuarios
+      issuer: livro-da-guilda
       ttl-seconds: 3600
       # 7 dias: vida do refresh token usado em /auth/refresh.
       refresh-ttl-seconds: 604800
