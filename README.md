@@ -5,7 +5,7 @@
 
 **[Demo pública](https://livro-da-guilda.onrender.com/swagger-ui.html)** (somente leitura) · **[Swagger local](http://localhost:8080/swagger-ui.html)** — suba com `mvn spring-boot:run` e explore os endpoints na documentação interativa.
 
-Na demo, faça login em `POST /auth/login` com `demo@eliascampos.dev` / `demo-readonly-2026`, copie o `accessToken` e clique em **Authorize** para autenticar as chamadas de `/api/v1/users` sem curl.
+Na demo, faça login em `POST /auth/login` com `demo@eliascampos.dev` / `demo-readonly-2026`, copie o `accessToken`, clique em **Authorize** e cole só o token (sem "Bearer"). Clique em um endpoint para expandir e depois em **Execute**. A demo é somente leitura: `GET` funciona, `POST`/`PUT`/`PATCH`/`DELETE` respondem `403`. O primeiro acesso pode levar ~1 minuto (instância free dorme).
 
 API REST para CRUD de usuários, com validação, paginação, filtros e documentação OpenAPI. Java 21, Spring Boot 3.5, MongoDB.
 
