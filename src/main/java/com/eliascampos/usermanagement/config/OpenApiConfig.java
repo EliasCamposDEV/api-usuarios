@@ -15,11 +15,11 @@ public class OpenApiConfig {
     static final String BEARER_SCHEME = "bearerAuth";
 
     @Bean
-    public OpenAPI userManagementOpenApi() {
+    public OpenAPI livroDaGuildaOpenApi() {
         return new OpenAPI()
                 .info(new Info()
-                        .title("User Management API")
-                        .description("API REST para gerenciamento de usuarios com Spring Boot e MongoDB. "
+                        .title("Livro da Guilda")
+                        .description("Cadastro de usuarios com JWT e papeis, inspirado em RPG. "
                                 + "Autentique em /auth/login e clique em Authorize para usar o access token.")
                         .version("1.0.0")
                         .contact(new Contact()
