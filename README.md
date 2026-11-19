@@ -13,8 +13,6 @@ O nome vem de RPG: o livro da guilda registra quem é membro, qual papel tem e o
 
 ## Demo
 
-![Fluxo no Swagger: login, Authorize, criar e listar usuários](docs/demo.gif)
-
 | | |
 |---|---|
 | Swagger UI | `https://livro-da-guilda.onrender.com/swagger-ui.html` |
