@@ -24,8 +24,8 @@ O nome vem de RPG: o livro da guilda registra quem é membro, qual papel tem e o
 A demo é **somente leitura de propósito**: qualquer pessoa pode logar e ler, mas
 `POST`/`PUT`/`PATCH`/`DELETE` em `/api/v1/**` retornam `403`. A raiz do site
 (`https://livro-da-guilda.onrender.com/`) redireciona para o Swagger, então dá
-para mandar esse link para alguém sem explicar nada. O GIF mostra o fluxo de
-escrita rodando localmente; a coleção do Postman funciona nos dois modos. O plano free
+para mandar esse link para alguém sem explicar nada. Para ver o fluxo de escrita
+completo, rode localmente ([docs/demo.md](docs/demo.md)); a coleção do Postman funciona nos dois modos. O plano free
 do Render hiberna por inatividade — o primeiro request pode levar 30–60 s.
 
 Como rodar, limpar e o que está bloqueado: [docs/demo.md](docs/demo.md). Para publicar

@@ -51,8 +51,8 @@ direto com `curl` também recebe `403`.
 ## Por que somente leitura
 
 Um admin público com escrita permitiria que qualquer visitante apagasse os dados ou
-usasse a API como hospedagem gratuita. O GIF e a coleção do Postman mostram o fluxo
-completo de escrita rodando localmente; a demo pública mostra contrato, autenticação,
+usasse a API como hospedagem gratuita. A coleção do Postman e o passo a passo de
+[rodar localmente](#rodar-a-demo-localmente) mostram o fluxo completo de escrita; a demo pública mostra contrato, autenticação,
 paginação, filtros e erros — que é o que um recrutador precisa ver.
 
 ## Rodar a demo localmente
