@@ -20,7 +20,11 @@ server:
 springdoc:
   swagger-ui:
     path: /swagger-ui.html
-    operations-sorter: method
+    tags-sorter: alpha
+    doc-expansion: list
+    default-models-expand-depth: -1
+    display-request-duration: true
+    filter: true
     try-it-out-enabled: true
     persist-authorization: true
   api-docs:
