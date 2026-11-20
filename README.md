@@ -49,6 +49,10 @@ mvn spring-boot:run
 
 `MONGODB_URI` é obrigatória em `prod`; sem ela a aplicação não sobe.
 
+Precisa de JDK 21 (o `mvn` falha se o `JAVA_HOME` apontar para outra versão).
+
+O projeto **não lê `.env`**: o Spring Boot só enxerga variáveis do ambiente/shell. O `.env.example` serve de referência, e o Docker Compose usa um `.env` na raiz para substituir `${...}` dentro do `compose`.
+
 ## Docker
 
 ```bash
@@ -56,6 +60,10 @@ docker compose up --build
 ```
 
 API em http://127.0.0.1:8081, MongoDB apenas na rede interna do Compose. Para inspecionar o banco: `docker compose exec mongo mongosh usuarios`.
+
+Na primeira subida, com o banco vazio, o Compose cria o admin `admin@local.dev` / `admin12345` (dá para trocar com `BOOTSTRAP_ADMIN_EMAIL` e `BOOTSTRAP_ADMIN_PASSWORD` no shell ou no `.env`). Sem isso não haveria usuário para logar.
+
+> Os exemplos de `curl` abaixo usam a porta `8080` (perfil `dev`). Com Docker, troque por `8081`.
 
 ## Autenticação
 
@@ -105,7 +113,7 @@ Senha atual errada devolve 400 com `code: INVALID_PASSWORD`.
 - O login usa os usuários do próprio banco (senha em BCrypt). Usuário com `active: false` não autentica.
 - O papel vem do campo `role`: token de `USER` recebe 403 em `/api/v1/users/**`.
 - Em `dev` um admin é criado na primeira subida: `admin@email.com` / `admin12345`.
-- Em `prod`, defina `APP_BOOTSTRAP_ADMIN_EMAIL` e `APP_BOOTSTRAP_ADMIN_PASSWORD` para criar o primeiro `ADMIN` em banco vazio; sem as variáveis nada é criado.
+- Em `prod`, defina `APP_BOOTSTRAP_ADMIN_EMAIL` e `APP_BOOTSTRAP_ADMIN_PASSWORD` para criar o primeiro `ADMIN` em banco vazio; sem as variáveis nada é criado (no `docker compose` elas já vêm definidas).
 - O perfil `demo` usa a mesma postura de `prod`, cria usuários fictícios e recusa escrita em `/api/v1/**` com `403 READ_ONLY_DEMO`; veja [docs/demo.md](docs/demo.md).
 - `JWT_SECRET` (mínimo 32 caracteres, HS256) é obrigatória em `prod`; sem ela a aplicação não sobe.
 - Validades em `app.security.jwt.ttl-seconds` (access) e `refresh-ttl-seconds` (refresh).

@@ -15,6 +15,11 @@ O bootstrap de admin só roda fora dos perfis `dev`, `test` e `demo`, só quando
 está vazio e só se as duas variáveis estiverem preenchidas. Depois de criar o primeiro
 admin, remova as variáveis do ambiente.
 
+No `docker compose`, os dois valores já vêm preenchidos para uso local
+(`admin@local.dev` / `admin12345`, sobrescreva com `BOOTSTRAP_ADMIN_EMAIL` e
+`BOOTSTRAP_ADMIN_PASSWORD`). Fora do Compose, sem eles a API sobe e não há como logar
+em um banco vazio, porque criar usuários exige um `ADMIN`.
+
 ## Demo pública
 
 O perfil `demo` repete a configuração de `prod` e acrescenta:

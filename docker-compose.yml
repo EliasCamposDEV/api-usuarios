@@ -23,6 +23,10 @@ services:
       MONGODB_URI: mongodb://mongo:27017/usuarios
       # Somente para o compose local; em producao defina um segredo proprio.
       JWT_SECRET: ${JWT_SECRET:-dev-compose-secret-change-me-0123456789}
+      # Primeiro ADMIN, criado so quando o banco esta vazio. Sem isso a API sobe
+      # sem nenhum usuario e nao ha como logar para criar os demais.
+      APP_BOOTSTRAP_ADMIN_EMAIL: ${BOOTSTRAP_ADMIN_EMAIL:-admin@local.dev}
+      APP_BOOTSTRAP_ADMIN_PASSWORD: ${BOOTSTRAP_ADMIN_PASSWORD:-admin12345}
       PORT: 8080
     ports:
       - "127.0.0.1:8081:8080"
