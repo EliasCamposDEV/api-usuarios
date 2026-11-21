@@ -31,7 +31,7 @@ import java.util.Locale;
 
 @Tag(name = "Autenticação", description = "Login, emissão de token e refresh")
 @RestController
-@RequestMapping("/auth")
+@RequestMapping(value = "/auth", produces = "application/json")
 public class AuthController {
 
     private final AuthenticationManager authenticationManager;

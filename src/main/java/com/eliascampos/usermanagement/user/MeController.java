@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Tag(name = "Conta", description = "Operações do usuário autenticado sobre si mesmo.")
 @SecurityRequirement(name = "bearerAuth")
 @RestController
-@RequestMapping("/api/v1/me")
+@RequestMapping(value = "/api/v1/me", produces = "application/json")
 public class MeController {
 
     private final UserService userService;

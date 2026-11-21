@@ -28,6 +28,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -36,7 +37,7 @@ import java.net.URI;
 @Tag(name = "Usuários", description = "Gerenciamento de usuários. Exige papel ADMIN.")
 @SecurityRequirement(name = "bearerAuth")
 @RestController
-@RequestMapping("/api/v1/users")
+@RequestMapping(value = "/api/v1/users", produces = "application/json")
 public class UserController {
 
     private final UserService userService;
@@ -65,6 +66,7 @@ public class UserController {
             @RequestParam(required = false) UserRole role,
             @Parameter(description = "Filtra por status: true (ativo) ou false (inativo)")
             @RequestParam(required = false) Boolean active,
+            @ParameterObject
             @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
         return userService.findAll(search, role, active, pageable);
     }

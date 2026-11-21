@@ -20,6 +20,7 @@ server:
 springdoc:
   swagger-ui:
     path: /swagger-ui.html
+    document-title: Livro da Guilda - API
     tags-sorter: alpha
     doc-expansion: list
     default-models-expand-depth: -1
