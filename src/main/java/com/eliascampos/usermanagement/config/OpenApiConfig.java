@@ -40,7 +40,6 @@ public class OpenApiConfig {
                                 3. Clique em **Authorize** e cole apenas o token (sem o prefixo `Bearer`).
                                 4. Expanda um endpoint, ajuste os parâmetros e clique em **Execute**.
 
-                                **Demo:** [abrir Swagger da demo](https://livro-da-guilda.onrender.com/swagger-ui.html)
                                 - Leitura funciona; escrita (POST/PUT/PATCH/DELETE em `/api/v1/**`) retorna `403 READ_ONLY_DEMO`.
                                 - A instância gratuita hiberna; o primeiro acesso pode levar 30-60 s.
                                 - Em execução local, use o admin criado no primeiro start (veja o README).
