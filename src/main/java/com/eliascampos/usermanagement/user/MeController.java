@@ -1,5 +1,6 @@
 package com.eliascampos.usermanagement.user;
 
+import com.eliascampos.usermanagement.exception.ApiError;
 import com.eliascampos.usermanagement.user.dto.ChangePasswordRequest;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -10,7 +11,6 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ProblemDetail;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -36,10 +36,14 @@ public class MeController {
             @ApiResponse(responseCode = "204", description = "Senha alterada"),
             @ApiResponse(responseCode = "400", description = "Senha atual incorreta ou nova senha inválida",
                     content = @Content(mediaType = "application/problem+json",
-                            schema = @Schema(implementation = ProblemDetail.class))),
+                            schema = @Schema(implementation = ApiError.class))),
             @ApiResponse(responseCode = "401", description = "Token ausente ou inválido",
                     content = @Content(mediaType = "application/problem+json",
-                            schema = @Schema(implementation = ProblemDetail.class)))
+                            schema = @Schema(implementation = ApiError.class))),
+            @ApiResponse(responseCode = "403",
+                    description = "Na demo pública, escrita retorna 403 READ_ONLY_DEMO",
+                    content = @Content(mediaType = "application/problem+json",
+                            schema = @Schema(implementation = ApiError.class)))
     })
     @PutMapping("/password")
     @ResponseStatus(HttpStatus.NO_CONTENT)

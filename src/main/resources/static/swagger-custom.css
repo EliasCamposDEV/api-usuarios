@@ -23,12 +23,39 @@
   letter-spacing: -0.02em;
 }
 
+.swagger-ui .info .renderedMarkdown {
+  max-width: 80ch;
+}
+
+.swagger-ui .info .renderedMarkdown p,
+.swagger-ui .info .renderedMarkdown ul,
+.swagger-ui .info .renderedMarkdown ol {
+  max-width: 80ch;
+}
+
+/* O Swagger centraliza os parágrafos com margin auto; alinha tudo à esquerda. */
+.swagger-ui .info .renderedMarkdown p {
+  margin-left: 0;
+  margin-right: 0;
+}
+
 .swagger-ui .info p,
 .swagger-ui .opblock-description-wrapper p,
 .swagger-ui .response-col_description__inner p {
-  max-width: 72ch;
   line-height: 1.6;
   color: #44403c;
+}
+
+.swagger-ui a,
+.swagger-ui .info a,
+.swagger-ui .renderedMarkdown a {
+  color: #047857;
+}
+
+.swagger-ui a:hover,
+.swagger-ui .info a:hover,
+.swagger-ui .renderedMarkdown a:hover {
+  color: #065f46;
 }
 
 .swagger-ui .opblock {
@@ -63,11 +90,42 @@
   color: #1c1917;
 }
 
+.swagger-ui .dialog-ux .modal-ux {
+  border-radius: 12px;
+}
+
 .swagger-ui .scheme-container {
   background: #fafaf9;
   border: 1px solid #e7e5e4;
   border-radius: 10px;
   box-shadow: none;
+}
+
+html.dark-mode .swagger-ui .info .title {
+  color: #fafaf9;
+}
+
+html.dark-mode .swagger-ui .info .renderedMarkdown p,
+html.dark-mode .swagger-ui .opblock-description-wrapper p,
+html.dark-mode .swagger-ui .response-col_description__inner p {
+  color: #d6d3d1;
+}
+
+html.dark-mode .swagger-ui a,
+html.dark-mode .swagger-ui .info a,
+html.dark-mode .swagger-ui .renderedMarkdown a {
+  color: #6ee7b7;
+}
+
+html.dark-mode .swagger-ui a:hover,
+html.dark-mode .swagger-ui .info a:hover,
+html.dark-mode .swagger-ui .renderedMarkdown a:hover {
+  color: #a7f3d0;
+}
+
+html.dark-mode .swagger-ui .scheme-container {
+  background: #1c1917;
+  border-color: #44403c;
 }
 
 .swagger-ui input[type="text"],
@@ -80,4 +138,22 @@
 .swagger-ui textarea:focus {
   border-color: #047857;
   box-shadow: 0 0 0 2px rgba(4, 120, 87, 0.15);
+}
+
+html.dark-mode .swagger-ui input[type="text"],
+html.dark-mode .swagger-ui textarea {
+  background: #1c1917;
+  border-color: #44403c;
+  color: #fafaf9;
+}
+
+html.dark-mode .swagger-ui input[type="text"]::placeholder,
+html.dark-mode .swagger-ui textarea::placeholder {
+  color: #a8a29e;
+}
+
+html.dark-mode .swagger-ui input[type="text"]:focus,
+html.dark-mode .swagger-ui textarea:focus {
+  border-color: #10b981;
+  box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.2);
 }

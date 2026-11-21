@@ -3,10 +3,12 @@ package com.eliascampos.usermanagement.auth;
 import com.eliascampos.usermanagement.auth.dto.LoginRequest;
 import com.eliascampos.usermanagement.auth.dto.RefreshRequest;
 import com.eliascampos.usermanagement.auth.dto.TokenResponse;
+import com.eliascampos.usermanagement.exception.ApiError;
 import com.eliascampos.usermanagement.security.AppUserDetails;
 import com.eliascampos.usermanagement.security.JwtService;
 import com.eliascampos.usermanagement.user.UserService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.headers.Header;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -16,7 +18,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ProblemDetail;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -54,13 +55,15 @@ public class AuthController {
             @ApiResponse(responseCode = "200", description = "Autenticado com sucesso"),
             @ApiResponse(responseCode = "400", description = "Corpo da requisição inválido",
                     content = @Content(mediaType = "application/problem+json",
-                            schema = @Schema(implementation = ProblemDetail.class))),
+                            schema = @Schema(implementation = ApiError.class))),
             @ApiResponse(responseCode = "401", description = "E-mail ou senha inválidos",
                     content = @Content(mediaType = "application/problem+json",
-                            schema = @Schema(implementation = ProblemDetail.class))),
+                            schema = @Schema(implementation = ApiError.class))),
             @ApiResponse(responseCode = "429", description = "Muitas tentativas de login",
+                    headers = @Header(name = "Retry-After",
+                            description = "Segundos até poder tentar novamente"),
                     content = @Content(mediaType = "application/problem+json",
-                            schema = @Schema(implementation = ProblemDetail.class)))
+                            schema = @Schema(implementation = ApiError.class)))
     })
     @PostMapping("/login")
     public TokenResponse login(@Valid @RequestBody LoginRequest request, HttpServletRequest httpRequest) {
@@ -88,7 +91,7 @@ public class AuthController {
             @ApiResponse(responseCode = "204", description = "Sessão encerrada"),
             @ApiResponse(responseCode = "401", description = "Token ausente ou inválido",
                     content = @Content(mediaType = "application/problem+json",
-                            schema = @Schema(implementation = ProblemDetail.class)))
+                            schema = @Schema(implementation = ApiError.class)))
     })
     @PostMapping("/logout")
     @ResponseStatus(HttpStatus.NO_CONTENT)
@@ -102,10 +105,10 @@ public class AuthController {
             @ApiResponse(responseCode = "200", description = "Novo par de tokens"),
             @ApiResponse(responseCode = "400", description = "Corpo da requisição inválido",
                     content = @Content(mediaType = "application/problem+json",
-                            schema = @Schema(implementation = ProblemDetail.class))),
+                            schema = @Schema(implementation = ApiError.class))),
             @ApiResponse(responseCode = "401", description = "Refresh token inválido ou expirado",
                     content = @Content(mediaType = "application/problem+json",
-                            schema = @Schema(implementation = ProblemDetail.class)))
+                            schema = @Schema(implementation = ApiError.class)))
     })
     @PostMapping("/refresh")
     public TokenResponse refresh(@Valid @RequestBody RefreshRequest request) {

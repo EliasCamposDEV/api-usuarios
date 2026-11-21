@@ -8,18 +8,18 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
 public record UserUpdateRequest(
-        @Schema(example = "Maria Silva Santos")
+        @Schema(description = "Nome completo do usuário", example = "Maria Silva Santos")
         @NotBlank(message = "O nome e obrigatorio")
         @Size(min = 2, max = 120, message = "O nome deve ter entre 2 e 120 caracteres")
         String name,
 
-        @Schema(example = "maria.santos@email.com")
+        @Schema(description = "E-mail único usado no login", example = "maria.santos@email.com")
         @NotBlank(message = "O e-mail e obrigatorio")
         @Email(message = "Informe um e-mail valido")
         @Size(max = 160, message = "O e-mail deve ter no maximo 160 caracteres")
         String email,
 
-        @Schema(example = "ADMIN")
+        @Schema(description = "Papel do usuário: USER (comum) ou ADMIN (gerencia usuários)", example = "ADMIN")
         @NotNull(message = "O perfil e obrigatorio")
         UserRole role
 ) {

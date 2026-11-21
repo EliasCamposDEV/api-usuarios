@@ -2,10 +2,10 @@ package com.eliascampos.usermanagement.user;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
-@Schema(description = "Papel do usuario: USER (uso comum) ou ADMIN (gerencia usuarios)")
+@Schema(description = "Papel do usuário: USER (uso comum) ou ADMIN (gerencia usuários)")
 public enum UserRole {
 
-    @Schema(description = "Usuario comum")
+    @Schema(description = "Usuário comum")
     USER,
 
     @Schema(description = "Administrador")

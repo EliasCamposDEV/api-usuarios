@@ -5,22 +5,22 @@ import org.springframework.data.domain.Page;
 
 import java.util.List;
 
-@Schema(description = "Pagina de resultados com metadados de paginacao")
+@Schema(description = "Página de resultados com metadados de paginação")
 public record PageResponse<T>(
 
-        @Schema(description = "Itens da pagina atual")
+        @Schema(description = "Itens da página atual")
         List<T> content,
 
-        @Schema(description = "Numero da pagina (base 0)", example = "0")
+        @Schema(description = "Número da página (começa em 0)", example = "0")
         int page,
 
-        @Schema(description = "Tamanho da pagina", example = "10")
+        @Schema(description = "Tamanho da página", example = "10")
         int size,
 
         @Schema(description = "Total de registros", example = "7")
         long totalElements,
 
-        @Schema(description = "Total de paginas", example = "1")
+        @Schema(description = "Total de páginas", example = "1")
         int totalPages
 
 ) {
