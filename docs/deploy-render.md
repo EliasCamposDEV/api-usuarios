@@ -48,7 +48,7 @@ Tempo estimado: 20 a 30 minutos. Custo: R$ 0.
 4. **Apply** e aguarde o build (primeiro build baixa as dependências Maven: 5–10 min).
 5. A URL fica no topo do serviço, algo como
    `https://livro-da-guilda.onrender.com`. Se o nome já estiver em uso, o Render
-   adiciona um sufixo — ajuste os links do README nesse caso.
+   adiciona um sufixo, ajuste os links do README nesse caso.
 
 Alternativa manual (sem Blueprint): **New** → **Web Service** → repositório →
 Runtime **Docker** → Plan **Free** → Health Check Path `/actuator/health` →
@@ -98,7 +98,7 @@ os 7 usuários. Os dados também somem se você apagar o cluster.
 | `401` no login da demo | Senha diferente da definida em `DEMO_ADMIN_PASSWORD` (o seeder só roda em banco vazio). |
 | `503`/timeout no primeiro acesso | Free tier hiberna após ~15 min ociosos; o primeiro request leva 30–60 s. |
 | `403 READ_ONLY_DEMO` em tudo | Esperado para escrita; leitura e login continuam funcionando. |
-| `ReadOnlyDemo` mas quero testar escrita | Rode local com o perfil `dev` (Mongo embutido) — a demo pública é só leitura por decisão de segurança. |
+| `ReadOnlyDemo` mas quero testar escrita | Rode local com o perfil `dev` (Mongo embutido), a demo pública é só leitura por decisão de segurança. |
 
 ## Segurança e limites
 

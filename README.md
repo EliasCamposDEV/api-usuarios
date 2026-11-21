@@ -3,13 +3,13 @@
 [![CI](https://github.com/EliasCamposDEV/livro-da-guilda/actions/workflows/ci.yml/badge.svg)](https://github.com/EliasCamposDEV/livro-da-guilda/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/github/license/EliasCamposDEV/livro-da-guilda)](LICENSE)
 
-**[Demo pública](https://livro-da-guilda.onrender.com/swagger-ui.html)** (somente leitura) · **[Swagger local](http://localhost:8080/swagger-ui.html)** — suba com `mvn spring-boot:run` e explore os endpoints na documentação interativa.
+**[Demo pública](https://livro-da-guilda.onrender.com/swagger-ui.html)** (somente leitura) · **[Swagger local](http://localhost:8080/swagger-ui.html)**, suba com `mvn spring-boot:run` e explore os endpoints na documentação interativa.
 
 Na demo, faça login em `POST /auth/login` com `demo@eliascampos.dev` / `demo-readonly-2026`, copie o `accessToken`, clique em **Authorize** e cole só o token (sem "Bearer"). Clique em um endpoint para expandir e depois em **Execute**. A demo é somente leitura: `GET` funciona, `POST`/`PUT`/`PATCH`/`DELETE` respondem `403`. O primeiro acesso pode levar ~1 minuto (instância free dorme).
 
 API REST para CRUD de usuários, com validação, paginação, filtros e documentação OpenAPI. Java 21, Spring Boot 3.5, MongoDB.
 
-O nome vem de RPG: o livro da guilda registra quem é membro, qual papel tem e o que pode fazer — a mesma ideia de um cadastro de usuários com JWT e papéis (`ADMIN`).
+O nome vem de RPG: o livro da guilda registra quem é membro, qual papel tem e o que pode fazer, a mesma ideia de um cadastro de usuários com JWT e papéis (`ADMIN`).
 
 ## Demo
 
@@ -26,7 +26,7 @@ A demo é **somente leitura de propósito**: qualquer pessoa pode logar e ler, m
 (`https://livro-da-guilda.onrender.com/`) redireciona para o Swagger, então dá
 para mandar esse link para alguém sem explicar nada. Para ver o fluxo de escrita
 completo, rode localmente ([docs/demo.md](docs/demo.md)); a coleção do Postman funciona nos dois modos. O plano free
-do Render hiberna por inatividade — o primeiro request pode levar 30–60 s.
+do Render hiberna por inatividade, o primeiro request pode levar 30–60 s.
 
 Como rodar, limpar e o que está bloqueado: [docs/demo.md](docs/demo.md). Para publicar
 sua própria instância: [docs/deploy-render.md](docs/deploy-render.md).
@@ -89,7 +89,7 @@ curl -X POST http://localhost:8080/auth/refresh \
   -d '{"refreshToken":"<refreshToken>"}'
 ```
 
-O refresh é **rotativo**: cada uso devolve um par novo e invalida o refresh anterior. Só o refresh mais recente de cada usuário vale — um novo login (ou refresh) derruba os anteriores. O access token já emitido continua válido até expirar (1 hora).
+O refresh é **rotativo**: cada uso devolve um par novo e invalida o refresh anterior. Só o refresh mais recente de cada usuário vale, um novo login (ou refresh) derruba os anteriores. O access token já emitido continua válido até expirar (1 hora).
 
 O refresh devolve 401 com `code: INVALID_REFRESH_TOKEN` se estiver expirado, adulterado, se for um access token, se já tiver sido usado, se o usuário foi desativado ou se outro login invalidou aquela sessão. Um refresh token não é aceito como access token nas rotas protegidas (401).
 
